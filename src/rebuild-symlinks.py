@@ -39,7 +39,7 @@ def live_domains(config_root):
 
 def hash_archive(archive_domain_dir):
     """Create a map of hashes to directory entries."""
-    hash_map = dict()
+    hash_map = {}
     with os.scandir(archive_domain_dir) as it:
         for entry in it:
             with open(entry.path, "rb") as f:
@@ -74,9 +74,7 @@ def relink(config_root, live_domain_entry):
             with open(live_entry.path, "rb") as f:
                 live_hash = hashlib.sha256(f.read()).hexdigest()
             logging.debug(f"{live_entry.name} hash {live_hash}")
-            # Try to find a matching hash in the archive map
-            archive_entry = hash_map.get(live_hash)
-            if archive_entry:
+            if archive_entry := hash_map.get(live_hash):
                 logging.debug(f"Found hash match {archive_entry.name}")
                 # Calculate the relative path between the files
                 rel_path = os.path.relpath(
@@ -124,10 +122,7 @@ def main():
 
     # Stop logging and clean up
     logging.shutdown()
-    if everything_is_good:
-        return 0
-    else:
-        return 1
+    return 0 if everything_is_good else 1
 
 
 if __name__ == "__main__":
